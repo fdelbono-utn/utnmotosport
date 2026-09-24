@@ -23,14 +23,7 @@
   .logo-svg { height:46px; }
   .header-right { display:flex; align-items:center; gap:12px; }
   .last-update { font-size:11px; color:var(--muted); }
-  .refresh-btn {
-    background:none; border:1px solid var(--border); color:var(--muted);
-    border-radius:4px; padding:4px 12px; font-size:11px; cursor:pointer;
-    transition:border-color .2s, color .2s;
-  }
-  .refresh-btn:hover { border-color:var(--red); color:var(--text); }
   .pill { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:11px; color:var(--muted); }
-  .countdown { font-size:10px; color:var(--label); }
 
   /* ── LAYOUT ── */
   main { padding:22px 28px; }
@@ -124,9 +117,7 @@
   </svg>
 
   <div class="header-right">
-    <span class="countdown" id="countdown"></span>
     <span class="last-update" id="last-update">Cargando...</span>
-    <button class="refresh-btn" onclick="refresh()">↻ Actualizar</button>
     <span class="pill">Finanzas</span>
   </div>
 </header>
@@ -471,26 +462,7 @@ async function fetchAndRender() {
   render();
 }
 
-// ── Auto-refresh cada 5 minutos ──────────────────────────────────────────
-let secondsLeft = 300;
-const countdownEl = document.getElementById('countdown');
-
-function tick() {
-  secondsLeft--;
-  if (secondsLeft <= 0) { secondsLeft=300; fetchAndRender(); }
-  const m=Math.floor(secondsLeft/60);
-  const s=String(secondsLeft%60).padStart(2,'0');
-  countdownEl.textContent=`Próxima actualización: ${m}:${s}`;
-}
-
-async function refresh() {
-  secondsLeft=300;
-  countdownEl.textContent='Actualizando...';
-  await fetchAndRender();
-}
-
 fetchAndRender();
-setInterval(tick, 1000);
 </script>
 </body>
 </html>
