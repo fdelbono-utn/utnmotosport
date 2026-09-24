@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTN BA Motorsport — Finanzas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --bg:#0f0f0f; --surface:#181818; --surface2:#222; --border:#2a2a2a;
+    --red:#e8192c; --green:#22c55e; --yellow:#f59e0b; --blue:#3b82f6;
+    --text:#f0f0f0; --muted:#888; --label:#4a4a4a;
+  }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; min-height:100vh; }
+
+  /* ── HEADER ── */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 28px; border-bottom:1px solid var(--border); background:var(--surface);
+  }
+  /* Logo SVG fiel a la imagen: UTN BA grande rojo + líneas + MOTORSPORT pequeño blanco */
+  .logo-svg { height:46px; }
+  .header-right { display:flex; align-items:center; gap:12px; }
+  .last-update { font-size:11px; color:var(--muted); }
+  .refresh-btn {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    border-radius:4px; padding:4px 12px; font-size:11px; cursor:pointer;
+    transition:border-color .2s, color .2s;
+  }
+  .refresh-btn:hover { border-color:var(--red); color:var(--text); }
+  .pill { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:11px; color:var(--muted); }
+  .countdown { font-size:10px; color:var(--label); }
+
+  /* ── LAYOUT ── */
+  main { padding:22px 28px; }
+  .section-title {
+    font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:.16em; color:var(--label); text-transform:uppercase;
+    margin-bottom:10px; margin-top:24px;
+  }
+
+  /* ── KPI ── */
+  .kpi-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; }
+  .kpi-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:7px;
+    padding:16px 16px 12px; position:relative; overflow:hidden;
+  }
+  .kpi-card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; }
+  .c-red::before    { background:var(--red); }
+  .c-green::before  { background:var(--green); }
+  .c-yellow::before { background:var(--yellow); }
+  .c-blue::before   { background:var(--blue); }
+  .kpi-label { font-size:10px; color:var(--muted); margin-bottom:7px; }
+  .kpi-value { font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; line-height:1; color:#fff; }
+  .kpi-value.neg { color:var(--red); }
+  .kpi-value.pos { color:var(--green); }
+  .kpi-value.yel { color:var(--yellow); }
+  .kpi-sub { font-size:10px; color:var(--muted); margin-top:5px; }
+
+  /* ── CHARTS ── */
+  .two-col   { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .three-col { display:grid; grid-template-columns:1.1fr 2fr; gap:8px; }
+  .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:18px; }
+  .chart-title { font-size:11px; font-weight:600; color:var(--muted); margin-bottom:14px; }
+
+  .bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .bar-label { font-size:11px; color:var(--muted); width:120px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-track { flex:1; height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+  .bar-fill  { height:100%; border-radius:3px; }
+  .bar-fill.red  { background:var(--red); }
+  .bar-fill.blue { background:var(--blue); }
+  .bar-amount { font-size:11px; color:var(--text); width:90px; text-align:right; flex-shrink:0; }
+
+  .donut-wrap { display:flex; align-items:center; gap:18px; }
+  .legend-item { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+  .legend-dot  { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .legend-name { font-size:11px; color:var(--muted); flex:1; }
+  .legend-pct  { font-size:11px; color:var(--text); font-weight:600; }
+
+  #spark-wrap { position:relative; }
+  #spark { width:100%; height:90px; display:block; cursor:crosshair; }
+  #spark-tooltip {
+    position:absolute; pointer-events:none; background:#111;
+    border:1px solid var(--border); border-radius:5px; padding:6px 10px;
+    font-size:11px; color:var(--text); white-space:nowrap; display:none; z-index:10;
+  }
+  .tt-date { color:var(--muted); margin-bottom:2px; }
+  .tt-val  { font-weight:700; font-size:13px; }
+  #spark-crosshair { position:absolute; top:0; width:1px; background:var(--red); opacity:.4; pointer-events:none; display:none; }
+
+  .tx-table { width:100%; border-collapse:collapse; }
+  .tx-table th { font-size:10px; font-weight:600; color:var(--label); letter-spacing:.06em; text-transform:uppercase; text-align:left; padding:0 0 9px; border-bottom:1px solid var(--border); }
+  .tx-table td { padding:8px 0; font-size:12px; color:var(--muted); border-bottom:1px solid #1c1c1c; vertical-align:middle; }
+  .tx-table td.name { color:var(--text); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tx-table td.amount { text-align:right; font-weight:600; color:var(--text); }
+  .tx-table td.amount.neg { color:var(--red); }
+  .badge { display:inline-block; font-size:10px; font-weight:600; padding:2px 7px; border-radius:3px; }
+  .badge.aprobado  { background:#14532d; color:#4ade80; }
+  .badge.pendiente { background:#451a03; color:#fbbf24; }
+  .badge.rechazado { background:#450a0a; color:#f87171; }
+
+  @media(max-width:1000px){
+    .kpi-grid { grid-template-columns:repeat(3,1fr); }
+    .two-col, .three-col { grid-template-columns:1fr; }
+    main { padding:14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Logo fiel al original: UTN BA rojo grande, líneas grises, MOTORSPORT blanco pequeño -->
+  <svg class="logo-svg" viewBox="0 0 240 46" xmlns="http://www.w3.org/2000/svg">
+    <!-- UTN BA en rojo, bold, grande -->
+    <text x="2" y="30" font-family="'Barlow Condensed',Arial,sans-serif" font-weight="800" font-size="32" fill="#e8192c" letter-spacing="0.5">UTN BA</text>
+    <!-- 4 barras grises debajo de UTN BA -->
+    <rect x="2"  y="36" width="12" height="3.5" fill="#666" rx="1"/>
+    <rect x="17" y="36" width="12" height="3.5" fill="#666" rx="1"/>
+    <rect x="32" y="36" width="12" height="3.5" fill="#666" rx="1"/>
+    <rect x="47" y="36" width="12" height="3.5" fill="#666" rx="1"/>
+    <!-- MOTORSPORT en blanco, más pequeño, a la derecha de las barras -->
+    <text x="65" y="44" font-family="'Barlow Condensed',Arial,sans-serif" font-weight="600" font-size="13" fill="#ffffff" letter-spacing="2.5">MOTORSPORT</text>
+  </svg>
+
+  <div class="header-right">
+    <span class="countdown" id="countdown"></span>
+    <span class="last-update" id="last-update">Cargando...</span>
+    <button class="refresh-btn" onclick="refresh()">↻ Actualizar</button>
+    <span class="pill">Finanzas</span>
+  </div>
+</header>
+
+<main>
+  <div class="section-title">Resumen general</div>
+  <div class="kpi-grid">
+    <div class="kpi-card c-red">
+      <div class="kpi-label">Saldo actual</div>
+      <div class="kpi-value neg" id="k-saldo">—</div>
+      <div class="kpi-sub">Solo aprobados</div>
+    </div>
+    <div class="kpi-card c-green">
+      <div class="kpi-label">Total ingresos</div>
+      <div class="kpi-value pos" id="k-ing">—</div>
+      <div class="kpi-sub">Aprobados</div>
+    </div>
+    <div class="kpi-card c-red">
+      <div class="kpi-label">Total egresos</div>
+      <div class="kpi-value" id="k-eg">—</div>
+      <div class="kpi-sub">Aprobados</div>
+    </div>
+    <div class="kpi-card c-yellow">
+      <div class="kpi-label">Monto pendiente</div>
+      <div class="kpi-value yel" id="k-pend-monto">—</div>
+      <div class="kpi-sub" id="k-pend-cant">—</div>
+    </div>
+    <div class="kpi-card c-blue">
+      <div class="kpi-label">Mayor aportante</div>
+      <div class="kpi-value" style="font-size:17px;color:#fff" id="k-top-name">—</div>
+      <div class="kpi-sub" id="k-top-monto">—</div>
+    </div>
+    <div class="kpi-card c-green">
+      <div class="kpi-label">Efectivo vs Banco</div>
+      <div class="kpi-value" style="font-size:17px;color:var(--green)" id="k-medio">—</div>
+      <div class="kpi-sub" id="k-medio-sub">—</div>
+    </div>
+  </div>
+
+  <div class="section-title">Distribución de gastos</div>
+  <div class="two-col">
+    <div class="chart-card">
+      <div class="chart-title">Por cuenta contable</div>
+      <div id="bars-cuenta"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Por centro de costos</div>
+      <div id="bars-centro"></div>
+    </div>
+  </div>
+
+  <div class="section-title">Financiamiento y evolución</div>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-title">Fuentes de ingreso</div>
+      <div class="donut-wrap">
+        <svg id="donut-svg" width="90" height="90" viewBox="0 0 100 100" style="flex-shrink:0"></svg>
+        <div id="donut-legend" style="flex:1"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Evolución saldo acumulado — pasá el mouse para ver detalles</div>
+      <div id="spark-wrap">
+        <div id="spark-tooltip">
+          <div class="tt-date" id="tt-date"></div>
+          <div class="tt-val"  id="tt-val"></div>
+        </div>
+        <div id="spark-crosshair"></div>
+        <svg id="spark" viewBox="0 0 600 90" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Últimas transacciones</div>
+  <div class="chart-card">
+    <table class="tx-table">
+      <thead><tr>
+        <th>Fecha</th><th>Descripción</th><th>Responsable</th>
+        <th>Centro de Costos</th><th>Estado</th>
+        <th style="text-align:right">Monto</th>
+      </tr></thead>
+      <tbody id="tx-body"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+// ── Datos reales del Sheet (se actualizan cuando cambia el Sheet) ──────────
+const TX = [
+  {f:"2026-04-26",t:"Ingreso",d:"Aporte de capital",r:"UTNBA MOTORSPORTS",cc:"",ca:"",m:278149,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-04-26",t:"Ingreso",d:"Aporte de capital",r:"UTNBA MOTORSPORTS",cc:"",ca:"",m:1173008,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-04-26",t:"Egreso",d:"Remeras",r:"Nicolas Koch",cc:"Electronica",ca:"Motor",m:459000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Pistola de pintura",r:"Nicolas Koch",cc:"Electronica",ca:"Motor",m:86300,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Llaveros 3D x300u",r:"Nicolas Koch",cc:"Electronica",ca:"Motor",m:210000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Pintura y thinner",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:30000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Chapas",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:33000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Tarjetas de presentacion x500u",r:"Lean",cc:"Electronica",ca:"Chasis",m:67000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Seguro responsabilidad civil",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:140157,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Seguro AP Claudio y empleados",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:70551,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Poxilina X6u",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:84000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Poxilina X2u",r:"Pachi",cc:"Electronica",ca:"Componentes",m:28000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Poxilina especial X1u",r:"Agus",cc:"Industrial",ca:"Chombas",m:65000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Rollos 3D",r:"Pereyra",cc:"Industrial",ca:"Chombas",m:94500,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Stickers X400u",r:"Nicolas Koch",cc:"Industrial",ca:"Chombas",m:19900,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Moto para stickers",r:"Nicolas Koch",cc:"Industrial",ca:"Chombas",m:24674,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Compra easy",r:"Azario",cc:"Industrial",ca:"Pantalones",m:26488,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Moto para llaveros",r:"Lean",cc:"Industrial",ca:"Pantalones",m:13000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-06-06",t:"Ingreso",d:"GRAMABI caños 1010",r:"Nicolas Koch",cc:"",ca:"",m:256300,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-06-06",t:"Egreso",d:"GRAMABI caños 1010",r:"Nicolas Koch",cc:"Industrial",ca:"Pantalones",m:256300,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-06-06",t:"Ingreso",d:"Hierros Torrent tubo 40x40x1.25",r:"Nicolas Koch",cc:"",ca:"",m:28123.99,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-06-06",t:"Egreso",d:"Hierros Torrent caño 40x40x1.25",r:"Nicolas Koch",cc:"Electronica",ca:"Componentes",m:28123.99,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Ingreso",d:"Ingreso ruedas mesa soldadura x8",r:"Nicolas Koch",cc:"",ca:"",m:39421,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Recompra Stickers",r:"Dante D'Amore",cc:"",ca:"",m:101000,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Recompra stickers",r:"Nicolas Koch",cc:"",ca:"",m:80000,mp:"Efectivo",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-07-03",t:"Ingreso",d:"Poxilina 250gr / 70gr",r:"Patricio Del Pesco",cc:"",ca:"",m:18700,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-07-03",t:"Ingreso",d:"Guantes de latex caja 100u",r:"Patricio Del Pesco",cc:"",ca:"",m:7700,mp:"Efectivo",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-07-03",t:"Ingreso",d:"Matriz MDF chasis",r:"Nicolas Koch",cc:"",ca:"",m:230000,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-07-03",t:"Ingreso",d:"Caños trompa chasis 25mm gramabi",r:"Nicolas Koch",cc:"",ca:"",m:74198,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-07-03",t:"Egreso",d:"Stickers",r:"Nicolas Koch",cc:"Electronica",ca:"Componentes",m:80000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Stickers (PENDIENTE DEV.)",r:"Dante D'Amore",cc:"Electronica",ca:"Componentes",m:101000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Ruedas mesa de soldadura",r:"Nicolas Koch",cc:"Electronica",ca:"Componentes",m:39421,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Poxilina 250 y 70gr",r:"Patricio Del Pesco",cc:"Electronica",ca:"Chasis",m:18700,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Guantes latex",r:"Patricio Del Pesco",cc:"Mecanica",ca:"Chasis",m:7700,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"MDF matriz chasis",r:"Nicolas Koch",cc:"Mecanica",ca:"Chasis",m:230000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Caños trompa chasis gramabi 25mm",r:"Nicolas Koch",cc:"Mecanica",ca:"Motor",m:74198,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-23",t:"Ingreso",d:"Compra de tubos 3/8 x2",r:"Leandro Díaz Aieta",cc:"",ca:"",m:28597,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-07-25",t:"Egreso",d:"Compra de tubos 3/8 x2",r:"Leandro Díaz Aieta",cc:"Mecanica",ca:"Motor",m:28597,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"Gramabi planchuela 1 3/4",r:"Leandro Díaz Aieta",cc:"",ca:"",m:31064,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-08-18",t:"Egreso",d:"Gramabi planchuela 1 3/4",r:"Leandro Díaz Aieta",cc:"Mecanica",ca:"Motor",m:31064,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"Bulonería M10/M12",r:"Leandro Díaz Aieta",cc:"",ca:"",m:9000,mp:"Efectivo",e:"Aprobado",fu:"Sponsor"},
+  {f:"2026-08-18",t:"Egreso",d:"Bulonería M10/M12",r:"Leandro Díaz Aieta",cc:"Mecanica",ca:"Motor",m:9000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY Componentes (201 USD)",r:"Pereyra Pigerl",cc:"",ca:"",m:243000,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY Componentes (201 USD)",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:243000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY IGBT FS950R08A6P2 (384 USD)",r:"Pereyra Pigerl",cc:"",ca:"",m:510045,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY IGBT FS950R08A6P2 (384 USD)",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:510045,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY Diodos SMD (209 USD)",r:"Pereyra Pigerl",cc:"",ca:"",m:254287,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY Diodos SMD (209 USD)",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:254287,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-09-05",t:"Ingreso",d:"P42A Molicel x200 + BMS Orion O2",r:"Nicolas Koch",cc:"",ca:"",m:16028012.13,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-09-05",t:"Egreso",d:"P42A Molicel x200 + BMS Orion O2",r:"Nicolas Koch",cc:"Mecanica",ca:"Motor",m:16028012.13,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-05-16",t:"Egreso",d:"Remeras (duplicado - rechazado)",r:"Nicolas Koch",cc:"Mecanica",ca:"Motor",m:459000,mp:"Banco",e:"Rechazado",fu:""},
+  {f:"2026-05-16",t:"Egreso",d:"Prueba - rechazado",r:"Gero Badeigts",cc:"Mecanica",ca:"Motor",m:200,mp:"Efectivo",e:"Rechazado",fu:""},
+  {f:"2026-09-19",t:"Egreso",d:"Cables de alta tensión 10m",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:62000,mp:"Banco",e:"Pendiente",fu:""},
+  {f:"2026-09-20",t:"Egreso",d:"Resina epoxi estructural",r:"Azario",cc:"Mecanica",ca:"Motor",m:38500,mp:"Efectivo",e:"Pendiente",fu:""},
+  {f:"2026-09-21",t:"Egreso",d:"Banner evento FSAE",r:"Dante D'Amore",cc:"Mecanica",ca:"Motor",m:55000,mp:"Banco",e:"Pendiente",fu:""},
+];
+
+// ── Utils ────────────────────────────────────────────────────────────────
+const fmt = v => '$' + Math.round(Math.abs(v)).toLocaleString('es-AR');
+const fmtFull = v => {
+  const s = Math.abs(v);
+  if (s >= 1000000) return '$' + (s/1000000).toFixed(2).replace('.',',') + ' M';
+  return '$' + Math.round(s).toLocaleString('es-AR');
+};
+
+function renderBars(id, data, cls) {
+  const max = Math.max(...data.map(d => d.v));
+  document.getElementById(id).innerHTML = data.map(d => `
+    <div class="bar-row">
+      <span class="bar-label" title="${d.k}">${d.k || 'Sin clasificar'}</span>
+      <div class="bar-track"><div class="bar-fill ${cls}" style="width:${(d.v/max*100).toFixed(1)}%"></div></div>
+      <span class="bar-amount">${fmt(d.v)}</span>
+    </div>`).join('');
+}
+
+function render() {
+  const aprobados  = TX.filter(t => t.e === 'Aprobado');
+  const ingresos   = aprobados.filter(t => t.t === 'Ingreso');
+  const egresos    = aprobados.filter(t => t.t === 'Egreso');
+  const pendientes = TX.filter(t => t.e === 'Pendiente');
+
+  const totalIng  = ingresos.reduce((s,t) => s+t.m, 0);
+  const totalEg   = egresos.reduce((s,t) => s+t.m, 0);
+  const saldo     = totalIng - totalEg;
+  const pendMonto = pendientes.reduce((s,t) => s+t.m, 0);
+
+  // KPIs
+  document.getElementById('k-saldo').textContent = (saldo < 0 ? '−' : '') + fmtFull(saldo);
+  document.getElementById('k-saldo').className = 'kpi-value ' + (saldo < 0 ? 'neg' : 'pos');
+  document.getElementById('k-ing').textContent  = fmtFull(totalIng);
+  document.getElementById('k-eg').textContent   = fmtFull(totalEg);
+  document.getElementById('k-pend-monto').textContent = fmtFull(pendMonto);
+  document.getElementById('k-pend-cant').textContent  = pendientes.length + ' transacciones pendientes';
+
+  const porResp = {};
+  ingresos.forEach(t => { porResp[t.r] = (porResp[t.r]||0) + t.m; });
+  const top = Object.entries(porResp).sort((a,b) => b[1]-a[1])[0];
+  if (top) {
+    document.getElementById('k-top-name').textContent  = top[0].split(' ').slice(0,2).join(' ');
+    document.getElementById('k-top-monto').textContent = fmtFull(top[1]) + ' aportados';
+  }
+
+  const tBanco = egresos.filter(t => t.mp === 'Banco').reduce((s,t) => s+t.m, 0);
+  const pctB   = totalEg > 0 ? (tBanco/totalEg*100).toFixed(0) : 0;
+  document.getElementById('k-medio').textContent    = pctB + '% Banco';
+  document.getElementById('k-medio-sub').textContent = (100-pctB) + '% efectivo';
+
+  // Bars
+  const byCuenta = {}, byCentro = {};
+  egresos.forEach(t => {
+    byCuenta[t.ca||'Sin clasificar'] = (byCuenta[t.ca||'Sin clasificar']||0) + t.m;
+    byCentro[t.cc||'Sin clasificar'] = (byCentro[t.cc||'Sin clasificar']||0) + t.m;
+  });
+  renderBars('bars-cuenta', Object.entries(byCuenta).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>({k,v})), 'red');
+  renderBars('bars-centro', Object.entries(byCentro).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({k,v})), 'blue');
+
+  // Donut
+  const byFuente = {};
+  ingresos.forEach(t => { const k=t.fu||'Otro'; byFuente[k]=(byFuente[k]||0)+t.m; });
+  const totalF = Object.values(byFuente).reduce((a,b)=>a+b,0);
+  const COLORS = ['#e8192c','#3b82f6','#22c55e','#f59e0b','#a855f7'];
+  const fData  = Object.entries(byFuente).sort((a,b)=>b[1]-a[1]);
+  let ang = -Math.PI/2, svgP = '';
+  const cx=50,cy=50,R=36,ri=20;
+  fData.forEach(([k,v],i) => {
+    const a = (v/totalF)*2*Math.PI;
+    const x1=cx+R*Math.cos(ang), y1=cy+R*Math.sin(ang); ang+=a;
+    const x2=cx+R*Math.cos(ang), y2=cy+R*Math.sin(ang);
+    const xi1=cx+ri*Math.cos(ang-a), yi1=cy+ri*Math.sin(ang-a);
+    const xi2=cx+ri*Math.cos(ang),   yi2=cy+ri*Math.sin(ang);
+    const lg=a>Math.PI?1:0;
+    svgP+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} L${xi2.toFixed(1)},${yi2.toFixed(1)} A${ri},${ri} 0 ${lg},0 ${xi1.toFixed(1)},${yi1.toFixed(1)} Z" fill="${COLORS[i%COLORS.length]}"/>`;
+  });
+  document.getElementById('donut-svg').innerHTML = svgP;
+  document.getElementById('donut-legend').innerHTML = fData.map(([k,v],i) => `
+    <div class="legend-item">
+      <span class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></span>
+      <span class="legend-name">${k}</span>
+      <span class="legend-pct">${(v/totalF*100).toFixed(0)}%</span>
+    </div>`).join('');
+
+  // Sparkline
+  const sorted = [...TX].filter(t=>t.e==='Aprobado').sort((a,b)=>a.f.localeCompare(b.f));
+  let acum = 0;
+  const sparkPoints = sorted.map(t => { acum += t.t==='Ingreso'?t.m:-t.m; return {f:t.f,v:acum}; });
+  const minV=Math.min(...sparkPoints.map(p=>p.v));
+  const maxV=Math.max(...sparkPoints.map(p=>p.v));
+  const W=600,H=90,PAD=5;
+  function toSVG(i,v) {
+    return { x: PAD+(i/(sparkPoints.length-1))*(W-PAD*2), y: H-PAD-(v-minV)/(maxV-minV)*(H-PAD*2) };
+  }
+  const ptsStr = sparkPoints.map((p,i)=>{ const {x,y}=toSVG(i,p.v); return `${x.toFixed(1)},${y.toFixed(1)}`; }).join(' ');
+  const lp = toSVG(sparkPoints.length-1, sparkPoints[sparkPoints.length-1].v);
+  document.getElementById('spark').innerHTML = `
+    <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8192c" stop-opacity=".25"/>
+      <stop offset="100%" stop-color="#e8192c" stop-opacity="0"/>
+    </linearGradient></defs>
+    <polygon points="${ptsStr} ${(W-PAD).toFixed(1)},${H} ${PAD},${H}" fill="url(#sg)"/>
+    <polyline points="${ptsStr}" fill="none" stroke="#e8192c" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="${lp.x.toFixed(1)}" cy="${lp.y.toFixed(1)}" r="3" fill="#e8192c"/>`;
+
+  // Tooltip sparkline
+  const svgEl     = document.getElementById('spark');
+  const tooltip   = document.getElementById('spark-tooltip');
+  const crosshair = document.getElementById('spark-crosshair');
+  svgEl.onmousemove = e => {
+    const rect = svgEl.getBoundingClientRect();
+    const idx  = Math.min(sparkPoints.length-1, Math.max(0, Math.round((e.clientX-rect.left)/rect.width*(sparkPoints.length-1))));
+    const pt   = sparkPoints[idx];
+    const {x}  = toSVG(idx, pt.v);
+    const pxX  = x/W*rect.width;
+    const [y,mo,d] = pt.f.split('-');
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    document.getElementById('tt-date').textContent = `${d} ${meses[parseInt(mo)-1]} ${y}`;
+    document.getElementById('tt-val').textContent  = (pt.v<0?'−':'')+fmt(pt.v);
+    document.getElementById('tt-val').style.color  = pt.v<0?'#e8192c':'#22c55e';
+    let left = pxX+12; if (left+160>rect.width) left=pxX-168;
+    tooltip.style.cssText   = `left:${left}px;top:4px;display:block;`;
+    crosshair.style.cssText = `left:${pxX}px;height:${rect.height}px;display:block;`;
+  };
+  svgEl.onmouseleave = () => { tooltip.style.display='none'; crosshair.style.display='none'; };
+
+  // Tabla
+  const recent = [...TX].sort((a,b)=>b.f.localeCompare(a.f)).slice(0,12);
+  document.getElementById('tx-body').innerHTML = recent.map(t => {
+    const [y,mo,d] = t.f.split('-');
+    return `<tr>
+      <td>${d}/${mo}/${y}</td>
+      <td class="name">${t.d}</td>
+      <td>${t.r.split(' ')[0]}</td>
+      <td>${t.cc||'—'}</td>
+      <td><span class="badge ${t.e.toLowerCase()}">${t.e}</span></td>
+      <td class="amount ${t.t==='Egreso'?'neg':''}">${t.t==='Egreso'?'−':'+'} ${fmt(t.m)}</td>
+    </tr>`;
+  }).join('');
+
+  // Timestamp
+  const now = new Date();
+  document.getElementById('last-update').textContent =
+    'Actualizado ' + now.toLocaleDateString('es-AR') + ' ' +
+    now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+}
+
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NJ1QVIe-X6dS00h1e6bEznIy3tEYeR87XT3R6XyBYgRoenLrt7yhIVOupU6WZ375HFZb0KVi5WNe/pub?gid=1075677233&single=true&output=csv';
+
+function parseMonto(str) {
+  if (typeof str === 'number') return str;
+  return parseFloat((str||'').replace(/\$/g,'').replace(/\./g,'').replace(',','.')) || 0;
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const cols=[]; let cur='', inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur);cur='';}
+      else{cur+=c;}
+    }
+    cols.push(cur);
+    const obj={};
+    headers.forEach((h,i)=>{obj[h]=(cols[i]||'').trim();});
+    return obj;
+  });
+}
+
+async function fetchAndRender() {
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = parseCSV(text).filter(r=>r['Tipo']);
+    if (!rows.length) throw new Error('empty');
+    const live = rows.map(r => {
+      const e=(r['Estado']||'');
+      const estado=e.toLowerCase().includes('aprobado')?'Aprobado':e.toLowerCase().includes('pendiente')?'Pendiente':e.toLowerCase().includes('rechazado')?'Rechazado':e;
+      return {
+        f:(r['Fecha']||'').slice(0,10), t:r['Tipo']||'', d:r['Descripción']||'',
+        r:r['Responsable']||'', cc:r['Centro de Costos']||'', ca:r['Cuenta Contable']||'',
+        m:parseMonto(r['Monto ($)']),
+        mp:(r['Medio de Pago']||'').includes('Banco')?'Banco':'Efectivo',
+        e:estado, fu:r['Fuente de Financiamiento']||''
+      };
+    }).filter(r=>r.t==='Ingreso'||r.t==='Egreso');
+    TX.length=0; live.forEach(r=>TX.push(r));
+    document.getElementById('last-update').style.color='#22c55e';
+  } catch(err) {
+    document.getElementById('last-update').style.color='#888';
+  }
+  render();
+}
+
+// ── Auto-refresh cada 5 minutos ──────────────────────────────────────────
+let secondsLeft = 300;
+const countdownEl = document.getElementById('countdown');
+
+function tick() {
+  secondsLeft--;
+  if (secondsLeft <= 0) { secondsLeft=300; fetchAndRender(); }
+  const m=Math.floor(secondsLeft/60);
+  const s=String(secondsLeft%60).padStart(2,'0');
+  countdownEl.textContent=`Próxima actualización: ${m}:${s}`;
+}
+
+async function refresh() {
+  secondsLeft=300;
+  countdownEl.textContent='Actualizando...';
+  await fetchAndRender();
+}
+
+fetchAndRender();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
