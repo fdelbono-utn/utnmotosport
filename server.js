@@ -1,7 +1,6 @@
 import http from 'http';
 
-const SHEET_ID = '1XFw9t0vp82Sj54yA6UnuNq5JFehbu3OReq4tCbBA_mI';
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Transacciones`;
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NJ1QVIe-X6dS00h1e6bEznIy3tEYeR87XT3R6XyBYgRoenLrt7yhIVOupU6WZ375HFZb0KVi5WNe/pub?gid=1075677233&single=true&output=csv';
 
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
