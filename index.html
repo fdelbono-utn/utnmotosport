@@ -23,7 +23,14 @@
   .logo-svg { height:46px; }
   .header-right { display:flex; align-items:center; gap:12px; }
   .last-update { font-size:11px; color:var(--muted); }
+  .refresh-btn {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    border-radius:4px; padding:4px 12px; font-size:11px; cursor:pointer;
+    transition:border-color .2s, color .2s;
+  }
+  .refresh-btn:hover { border-color:var(--red); color:var(--text); }
   .pill { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:11px; color:var(--muted); }
+  .countdown { font-size:10px; color:var(--label); }
 
   /* ── LAYOUT ── */
   main { padding:22px 28px; }
@@ -117,7 +124,9 @@
   </svg>
 
   <div class="header-right">
+    <span class="countdown" id="countdown"></span>
     <span class="last-update" id="last-update">Cargando...</span>
+    <button class="refresh-btn" onclick="refresh()">↻ Actualizar</button>
     <span class="pill">Finanzas</span>
   </div>
 </header>
@@ -411,58 +420,28 @@ function render() {
     now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
 }
 
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NJ1QVIe-X6dS00h1e6bEznIy3tEYeR87XT3R6XyBYgRoenLrt7yhIVOupU6WZ375HFZb0KVi5WNe/pub?gid=1075677233&single=true&output=csv';
+// ── Auto-refresh cada 5 minutos ──────────────────────────────────────────
+let secondsLeft = 300;
+const countdownEl = document.getElementById('countdown');
 
-function parseMonto(str) {
-  if (typeof str === 'number') return str;
-  return parseFloat((str||'').replace(/\$/g,'').replace(/\./g,'').replace(',','.')) || 0;
-}
-
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(line => {
-    const cols=[]; let cur='', inQ=false;
-    for(let i=0;i<line.length;i++){
-      const c=line[i];
-      if(c==='"'){inQ=!inQ;}
-      else if(c===','&&!inQ){cols.push(cur);cur='';}
-      else{cur+=c;}
-    }
-    cols.push(cur);
-    const obj={};
-    headers.forEach((h,i)=>{obj[h]=(cols[i]||'').trim();});
-    return obj;
-  });
-}
-
-async function fetchAndRender() {
-  try {
-    const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const text = await res.text();
-    const rows = parseCSV(text).filter(r=>r['Tipo']);
-    if (!rows.length) throw new Error('empty');
-    const live = rows.map(r => {
-      const e=(r['Estado']||'');
-      const estado=e.toLowerCase().includes('aprobado')?'Aprobado':e.toLowerCase().includes('pendiente')?'Pendiente':e.toLowerCase().includes('rechazado')?'Rechazado':e;
-      return {
-        f:(r['Fecha']||'').slice(0,10), t:r['Tipo']||'', d:r['Descripción']||'',
-        r:r['Responsable']||'', cc:r['Centro de Costos']||'', ca:r['Cuenta Contable']||'',
-        m:parseMonto(r['Monto ($)']),
-        mp:(r['Medio de Pago']||'').includes('Banco')?'Banco':'Efectivo',
-        e:estado, fu:r['Fuente de Financiamiento']||''
-      };
-    }).filter(r=>r.t==='Ingreso'||r.t==='Egreso');
-    TX.length=0; live.forEach(r=>TX.push(r));
-    document.getElementById('last-update').style.color='#22c55e';
-  } catch(err) {
-    document.getElementById('last-update').style.color='#888';
+function tick() {
+  secondsLeft--;
+  if (secondsLeft <= 0) {
+    secondsLeft = 300;
+    render();
   }
+  const m = Math.floor(secondsLeft/60);
+  const s = String(secondsLeft%60).padStart(2,'0');
+  countdownEl.textContent = `Próxima actualización: ${m}:${s}`;
+}
+
+function refresh() {
+  secondsLeft = 300;
   render();
 }
 
-fetchAndRender();
+render();
+setInterval(tick, 1000);
 </script>
 </body>
 </html>
