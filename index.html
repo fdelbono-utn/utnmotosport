@@ -214,64 +214,56 @@
 </main>
 
 <script>
-// ── Datos reales del Sheet (se actualizan cuando cambia el Sheet) ──────────
-const TX = [
-  {f:"2026-04-26",t:"Ingreso",d:"Aporte de capital",r:"UTNBA MOTORSPORTS",cc:"",ca:"",m:278149,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-04-26",t:"Ingreso",d:"Aporte de capital",r:"UTNBA MOTORSPORTS",cc:"",ca:"",m:1173008,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-04-26",t:"Egreso",d:"Remeras",r:"Nicolas Koch",cc:"Electronica",ca:"Motor",m:459000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Pistola de pintura",r:"Nicolas Koch",cc:"Electronica",ca:"Motor",m:86300,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Llaveros 3D x300u",r:"Nicolas Koch",cc:"Electronica",ca:"Motor",m:210000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Pintura y thinner",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:30000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Chapas",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:33000,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Tarjetas de presentacion x500u",r:"Lean",cc:"Electronica",ca:"Chasis",m:67000,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Seguro responsabilidad civil",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:140157,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Seguro AP Claudio y empleados",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:70551,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Poxilina X6u",r:"Nicolas Koch",cc:"Electronica",ca:"Chasis",m:84000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Poxilina X2u",r:"Pachi",cc:"Electronica",ca:"Componentes",m:28000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Poxilina especial X1u",r:"Agus",cc:"Industrial",ca:"Chombas",m:65000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Rollos 3D",r:"Pereyra",cc:"Industrial",ca:"Chombas",m:94500,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Stickers X400u",r:"Nicolas Koch",cc:"Industrial",ca:"Chombas",m:19900,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Moto para stickers",r:"Nicolas Koch",cc:"Industrial",ca:"Chombas",m:24674,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Compra easy",r:"Azario",cc:"Industrial",ca:"Pantalones",m:26488,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-04-26",t:"Egreso",d:"Moto para llaveros",r:"Lean",cc:"Industrial",ca:"Pantalones",m:13000,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-06-06",t:"Ingreso",d:"GRAMABI caños 1010",r:"Nicolas Koch",cc:"",ca:"",m:256300,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-06-06",t:"Egreso",d:"GRAMABI caños 1010",r:"Nicolas Koch",cc:"Industrial",ca:"Pantalones",m:256300,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-06-06",t:"Ingreso",d:"Hierros Torrent tubo 40x40x1.25",r:"Nicolas Koch",cc:"",ca:"",m:28123.99,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-06-06",t:"Egreso",d:"Hierros Torrent caño 40x40x1.25",r:"Nicolas Koch",cc:"Electronica",ca:"Componentes",m:28123.99,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Ingreso",d:"Ingreso ruedas mesa soldadura x8",r:"Nicolas Koch",cc:"",ca:"",m:39421,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-07-03",t:"Ingreso",d:"Recompra Stickers",r:"Dante D'Amore",cc:"",ca:"",m:101000,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-07-03",t:"Ingreso",d:"Recompra stickers",r:"Nicolas Koch",cc:"",ca:"",m:80000,mp:"Efectivo",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-07-03",t:"Ingreso",d:"Poxilina 250gr / 70gr",r:"Patricio Del Pesco",cc:"",ca:"",m:18700,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-07-03",t:"Ingreso",d:"Guantes de latex caja 100u",r:"Patricio Del Pesco",cc:"",ca:"",m:7700,mp:"Efectivo",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-07-03",t:"Ingreso",d:"Matriz MDF chasis",r:"Nicolas Koch",cc:"",ca:"",m:230000,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-07-03",t:"Ingreso",d:"Caños trompa chasis 25mm gramabi",r:"Nicolas Koch",cc:"",ca:"",m:74198,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-07-03",t:"Egreso",d:"Stickers",r:"Nicolas Koch",cc:"Electronica",ca:"Componentes",m:80000,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Egreso",d:"Stickers (PENDIENTE DEV.)",r:"Dante D'Amore",cc:"Electronica",ca:"Componentes",m:101000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Egreso",d:"Ruedas mesa de soldadura",r:"Nicolas Koch",cc:"Electronica",ca:"Componentes",m:39421,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Egreso",d:"Poxilina 250 y 70gr",r:"Patricio Del Pesco",cc:"Electronica",ca:"Chasis",m:18700,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Egreso",d:"Guantes latex",r:"Patricio Del Pesco",cc:"Mecanica",ca:"Chasis",m:7700,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Egreso",d:"MDF matriz chasis",r:"Nicolas Koch",cc:"Mecanica",ca:"Chasis",m:230000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-07-03",t:"Egreso",d:"Caños trompa chasis gramabi 25mm",r:"Nicolas Koch",cc:"Mecanica",ca:"Motor",m:74198,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-07-23",t:"Ingreso",d:"Compra de tubos 3/8 x2",r:"Leandro Díaz Aieta",cc:"",ca:"",m:28597,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-07-25",t:"Egreso",d:"Compra de tubos 3/8 x2",r:"Leandro Díaz Aieta",cc:"Mecanica",ca:"Motor",m:28597,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-08-18",t:"Ingreso",d:"Gramabi planchuela 1 3/4",r:"Leandro Díaz Aieta",cc:"",ca:"",m:31064,mp:"Banco",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-08-18",t:"Egreso",d:"Gramabi planchuela 1 3/4",r:"Leandro Díaz Aieta",cc:"Mecanica",ca:"Motor",m:31064,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-08-18",t:"Ingreso",d:"Bulonería M10/M12",r:"Leandro Díaz Aieta",cc:"",ca:"",m:9000,mp:"Efectivo",e:"Aprobado",fu:"Sponsor"},
-  {f:"2026-08-18",t:"Egreso",d:"Bulonería M10/M12",r:"Leandro Díaz Aieta",cc:"Mecanica",ca:"Motor",m:9000,mp:"Efectivo",e:"Aprobado",fu:""},
-  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY Componentes (201 USD)",r:"Pereyra Pigerl",cc:"",ca:"",m:243000,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY Componentes (201 USD)",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:243000,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY IGBT FS950R08A6P2 (384 USD)",r:"Pereyra Pigerl",cc:"",ca:"",m:510045,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY IGBT FS950R08A6P2 (384 USD)",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:510045,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY Diodos SMD (209 USD)",r:"Pereyra Pigerl",cc:"",ca:"",m:254287,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY Diodos SMD (209 USD)",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:254287,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-09-05",t:"Ingreso",d:"P42A Molicel x200 + BMS Orion O2",r:"Nicolas Koch",cc:"",ca:"",m:16028012.13,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
-  {f:"2026-09-05",t:"Egreso",d:"P42A Molicel x200 + BMS Orion O2",r:"Nicolas Koch",cc:"Mecanica",ca:"Motor",m:16028012.13,mp:"Banco",e:"Aprobado",fu:""},
-  {f:"2026-05-16",t:"Egreso",d:"Remeras (duplicado - rechazado)",r:"Nicolas Koch",cc:"Mecanica",ca:"Motor",m:459000,mp:"Banco",e:"Rechazado",fu:""},
-  {f:"2026-05-16",t:"Egreso",d:"Prueba - rechazado",r:"Gero Badeigts",cc:"Mecanica",ca:"Motor",m:200,mp:"Efectivo",e:"Rechazado",fu:""},
-  {f:"2026-09-19",t:"Egreso",d:"Cables de alta tensión 10m",r:"Pereyra Pigerl",cc:"Mecanica",ca:"Motor",m:62000,mp:"Banco",e:"Pendiente",fu:""},
-  {f:"2026-09-20",t:"Egreso",d:"Resina epoxi estructural",r:"Azario",cc:"Mecanica",ca:"Motor",m:38500,mp:"Efectivo",e:"Pendiente",fu:""},
-  {f:"2026-09-21",t:"Egreso",d:"Banner evento FSAE",r:"Dante D'Amore",cc:"Mecanica",ca:"Motor",m:55000,mp:"Banco",e:"Pendiente",fu:""},
-];
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMtM6Vu9-PCSlzwoFW_iBpGbf4OUHB-FDS5heCLs0kVwWVwYgMRXn0palANUlxXN_p8Fq5PeRObS-c/pub?gid=1075677233&single=true&output=csv';
+
+function parseMonto(str) {
+  if (typeof str === 'number') return str;
+  return parseFloat((str||'').replace(/\$/g,'').replace(/\./g,'').replace(',','.')) || 0;
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const cols=[]; let cur='', inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur);cur='';}
+      else{cur+=c;}
+    }
+    cols.push(cur);
+    const obj={};
+    headers.forEach((h,i)=>{obj[h]=(cols[i]||'').trim();});
+    return obj;
+  });
+}
+
+let TX = [];
+
+async function loadData() {
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = parseCSV(text).filter(r=>r['Tipo']==='Ingreso'||r['Tipo']==='Egreso');
+    TX = rows.map(r => {
+      const e=(r['Estado']||'');
+      const estado=e.toLowerCase().includes('aprobado')?'Aprobado':e.toLowerCase().includes('pendiente')?'Pendiente':e.toLowerCase().includes('rechazado')?'Rechazado':e;
+      return {
+        f:(r['Fecha']||'').slice(0,10), t:r['Tipo']||'', d:r['Descripción']||'',
+        r:r['Responsable']||'', cc:r['Centro de Costos']||'', ca:r['Cuenta Contable']||'',
+        m:parseMonto(r['Monto ($)']),
+        mp:(r['Medio de Pago']||'').includes('Banco')?'Banco':'Efectivo',
+        e:estado, fu:r['Fuente de Financiamiento']||''
+      };
+    });
+    document.getElementById('last-update').style.color='#22c55e';
+  } catch(err) {
+    document.getElementById('last-update').style.color='#e8192c';
+    console.error('Error cargando datos:', err);
+  }
+}
 
 // ── Utils ────────────────────────────────────────────────────────────────
 const fmt = v => '$' + Math.round(Math.abs(v)).toLocaleString('es-AR');
@@ -440,8 +432,8 @@ function refresh() {
   render();
 }
 
-render();
-setInterval(tick, 1000);
+loadData().then(() => render());
+setInterval(() => { loadData().then(() => render()); }, 300000);
 </script>
 </body>
 </html>
