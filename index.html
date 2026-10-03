@@ -304,7 +304,7 @@ async function loadData() {
       const e=(r['Estado']||'');
       const estado=e.toLowerCase().includes('aprobado')?'Aprobado':e.toLowerCase().includes('pendiente')?'Pendiente':e.toLowerCase().includes('rechazado')?'Rechazado':e;
       return {
-        f:(r['Fecha']||'').slice(0,10), t:r['Tipo']||'', d:r['Descripción']||'',
+        f:((r['Fecha']||'').includes('/')?r['Fecha'].split('/').reverse().join('-'):(r['Fecha']||'').slice(0,10)), t:r['Tipo']||'', d:r['Descripción']||'',
         r:r['Responsable']||'', cc:r['Centro de Costos']||'', ca:r['Cuenta Contable']||'',
         m:parseMonto(r['Monto ($)']),
         mp:(r['Medio de Pago']||'').includes('Banco')?'Banco':'Efectivo',
@@ -447,9 +447,8 @@ function render() {
   // Tabla
   const recent = [...TX].sort((a,b)=>b.f.localeCompare(a.f)).slice(0,12);
   document.getElementById('tx-body').innerHTML = recent.map(t => {
-    const [y,mo,d] = t.f.split('-');
     return `<tr>
-      <td>${d}/${mo}/${y}</td>
+      <td>${t.f||'—'}</td>
       <td class="name">${t.d}</td>
       <td>${t.r.split(' ')[0]}</td>
       <td>${t.cc||'—'}</td>
