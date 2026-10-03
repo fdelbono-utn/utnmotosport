@@ -214,7 +214,7 @@
 </main>
 
 <script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMtM6Vu9-PCSlzwoFW_iBpGbf4OUHB-FDS5heCLs0kVwWVwYgMRXn0palANUlxXN_p8Fq5PeRObS-c/pub?gid=1075677233&single=true&output=csv';
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NJ1QVIe-X6dS00h1e6bEznIy3tEYeR87XT3R6XyBYgRoenLrt7yhIVOupU6WZ375HFZb0KVi5WNe/pub?gid=1075677233&single=true&output=csv';
 
 function parseMonto(str) {
   if (typeof str === 'number') return str;
@@ -239,7 +239,60 @@ function parseCSV(text) {
   });
 }
 
-let TX = [];
+const TX = [
+  {f:"2026-04-26",t:"Egreso",d:"Remeras",r:"Nicolas Koch",cc:"Industrial",ca:"Merchandising",m:459000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Pistola de pintura",r:"Nicolas Koch",cc:"Industrial",ca:"Maquinaria y Equipos",m:86300,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Llaveros 3D x300u",r:"Nicolas Koch",cc:"Industrial",ca:"Merchandising",m:210000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Pintura y thinner",r:"Nicolas Koch",cc:"Industrial",ca:"Materia Prima / Insumos",m:30000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Chapas",r:"Nicolas Koch",cc:"Industrial",ca:"Materia Prima / Insumos",m:33000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Tarjetas de presentacion x500u",r:"Lean",cc:"Industrial",ca:"Merchandising",m:67000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Seguro responsabilidad civil",r:"Nicolas Koch",cc:"Industrial",ca:"Seguros",m:140157,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Seguro AP Claudio y empleados",r:"Nicolas Koch",cc:"Mecánica",ca:"Seguros",m:70551,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Poxilina X6u",r:"Nicolas Koch",cc:"Mecánica",ca:"Materia Prima / Insumos",m:84000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Poxilina X2u",r:"Pachi",cc:"Mecánica",ca:"Materia Prima / Insumos",m:28000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Poxilina especial X1u",r:"Agus",cc:"Mecánica",ca:"Materia Prima / Insumos",m:65000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Rollos 3D",r:"Pereyra",cc:"Mecánica",ca:"Materia Prima / Insumos",m:94500,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Stickers X400u",r:"Nicolas Koch",cc:"Mecánica",ca:"Merchandising",m:19900,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Moto para stickers",r:"Nicolas Koch",cc:"Mecánica",ca:"Gasto de Traslado",m:24674,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Compra easy",r:"Azario",cc:"Mecánica",ca:"Compras Varias",m:26488,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Moto para llaveros",r:"Lean",cc:"Mecánica",ca:"Gasto de Traslado",m:13000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Ingreso",d:"Aporte de capital",r:"UTNBA MOTORSPORTS",cc:"",ca:"",m:278149,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-04-26",t:"Ingreso",d:"Aporte de capital",r:"UTNBA MOTORSPORTS",cc:"",ca:"",m:1173008,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-06-06",t:"Ingreso",d:"GRAMABI caños 1010",r:"Nicolas Koch",cc:"",ca:"",m:256300,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-06-06",t:"Ingreso",d:"Hierros Torrent tubo 40x40x1.25",r:"Nicolas Koch",cc:"",ca:"",m:28123.99,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-06-06",t:"Egreso",d:"GRAMABI caños 1010",r:"Nicolas Koch",cc:"Mecánica",ca:"Materia Prima / Insumos",m:256300,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-06-06",t:"Egreso",d:"Hierros Torrent caño 40x40x1.25",r:"Nicolas Koch",cc:"Mecánica",ca:"Materia Prima / Insumos",m:28123.99,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Ingreso",d:"Caños para trompa de chasis 25mm gramabi",r:"Nicolas Koch",cc:"",ca:"",m:74198,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Matriz MDF chasis",r:"Nicolas Koch",cc:"",ca:"",m:230000,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Guantes de latex caja 100u",r:"Patricio Del Pesco",cc:"",ca:"",m:7700,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Poxilina 250gr / Poxilina 70gr",r:"Patricio Del Pesco",cc:"",ca:"",m:18700,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Recompra stickers",r:"Nicolas Koch",cc:"",ca:"",m:80000,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Recompra Stickers",r:"Dante D'Amore",cc:"",ca:"",m:101000,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Ingreso",d:"Ingreso de dinero para compra de ruedas mesa soldadura x8",r:"Nicolas Koch",cc:"",ca:"",m:39421,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-03",t:"Egreso",d:"Stickers",r:"Nicolas Koch",cc:"Electronica",ca:"Merchandising",m:80000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Stickers (PENDIENTE DEVOLUCION A RESPONSABLE)",r:"Dante D'Amore",cc:"Electronica",ca:"Merchandising",m:101000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Ruedas mesa de soldadura",r:"Nicolas Koch",cc:"Electronica",ca:"Maquinaria y Equipos",m:39421,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Poxilina 250 y 70gr",r:"Patricio Del Pesco",cc:"Electronica",ca:"Materia Prima / Insumos",m:18700,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Guantes latex",r:"Patricio Del Pesco",cc:"Electronica",ca:"Materia Prima / Insumos",m:7700,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"MDF matriz chasis",r:"Nicolas Koch",cc:"Electronica",ca:"Maquinaria y Equipos",m:230000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-03",t:"Egreso",d:"Caños trompa chasis gramabi 25mm",r:"Nicolas Koch",cc:"Electronica",ca:"Materia Prima / Insumos",m:74198,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-07-23",t:"Ingreso",d:"Compra de tubos 3/8 x2",r:"Leandro Díaz Aieta",cc:"",ca:"",m:28597,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-07-25",t:"Egreso",d:"Compra de tubos 3/8 x2",r:"Leandro Díaz Aieta",cc:"Electronica",ca:"Materia Prima / Insumos",m:28597,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Egreso",d:"Gramabi; planchuela de hierro 1 3/4 barra lisa 44,50x4",r:"Leandro Díaz Aieta",cc:"Electronica",ca:"Materia Prima / Insumos",m:31064,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"Gramabi; planchuela de hierro 1 3/4 barra lisa 44,50x4",r:"Leandro Díaz Aieta",cc:"",ca:"",m:31064,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Ingreso",d:"Bulonería M10/M12 (hexagonal + autofrenante)",r:"Leandro Díaz Aieta",cc:"",ca:"",m:9000,mp:"Efectivo",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"Bulonería M10/M12 (hexagonal + autofrenante)",r:"Leandro Díaz Aieta",cc:"Electronica",ca:"Materia Prima / Insumos",m:9000,mp:"Efectivo",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY ELECTRONICS - Componentes electrónicos (201.14 USD)",r:"Nicolas Enrique Pereyra Pigerl",cc:"",ca:"",m:243000,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY ELECTRONICS - Componentes electrónicos (201.14 USD)",r:"Nicolas Enrique Pereyra Pigerl",cc:"Electronica",ca:"Materia Prima / Insumos",m:243000,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY - IGBT FS950R08A6P2 y diodos (384.94 USD)",r:"Nicolas Enrique Pereyra Pigerl",cc:"",ca:"",m:510045,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY - IGBT FS950R08A6P2 y diodos (384.94 USD)",r:"Nicolas Enrique Pereyra Pigerl",cc:"Electronica",ca:"Materia Prima / Insumos",m:510045,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-08-18",t:"Ingreso",d:"DIGI-KEY - Diodos y resistencias SMD (209.29 USD)",r:"Nicolas Enrique Pereyra Pigerl",cc:"",ca:"",m:254287,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-08-18",t:"Egreso",d:"DIGI-KEY - Diodos y resistencias SMD (209.29 USD)",r:"Nicolas Enrique Pereyra Pigerl",cc:"Electronica",ca:"Materia Prima / Insumos",m:254287,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-09-05",t:"Ingreso",d:"P42A Molicel x200 + BMS Orion O2 + CANdapter",r:"Nicolas Koch",cc:"",ca:"",m:16028012.13,mp:"Banco",e:"Aprobado",fu:"Aporte de Socio"},
+  {f:"2026-09-05",t:"Egreso",d:"P42A Molicel x200 + BMS Orion O2 + CANdapter",r:"Nicolas Koch",cc:"Electronica",ca:"Materia Prima / Insumos",m:16028012.13,mp:"Banco",e:"Aprobado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Remeras (duplicado)",r:"Nicolas Koch",cc:"Electronica",ca:"Merchandising",m:459000,mp:"Banco",e:"Rechazado",fu:""},
+  {f:"2026-04-26",t:"Egreso",d:"Prueba",r:"Gero Badeigts",cc:"Electronica",ca:"Compras Varias",m:200,mp:"Efectivo",e:"Rechazado",fu:""},
+];
 
 async function loadData() {
   try {
